@@ -233,6 +233,12 @@ jobs:
           find . -name "*.apk" -exec mv {} ${{ github.workspace }}/apk/ \;
           ls -lh ${{ github.workspace }}/apk/
 
+      - name: Upload App To Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: com.github.tvbox.fongmi
+          path: ${{ github.workspace }}/apk/*.apk
+
       - name: Build Summary
         if: always()
         run: |
