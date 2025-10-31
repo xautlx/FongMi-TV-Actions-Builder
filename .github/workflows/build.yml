@@ -230,7 +230,7 @@ jobs:
       - name: Prepare App
         run: |
           mkdir -p ${{ github.workspace }}/apk/
-          ls -lh src
+          ls -lh src/app/build/outputs/apk
           find . -name "*.apk" -exec mv {} ${{ github.workspace }}/apk/ \;
           ls -lh ${{ github.workspace }}/apk/
 
