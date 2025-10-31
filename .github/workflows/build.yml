@@ -230,8 +230,8 @@ jobs:
       - name: Prepare App
         run: |
           mkdir -p ${{ github.workspace }}/apk/
-          ls -lh src/**/build/outputs/apk/**/release/*.apk 
-          mv src/**/build/outputs/apk/**/release/*.apk ${{ github.workspace }}/apk/
+          ls -lh src
+          find . -name "*.apk" -exec mv {} ${{ github.workspace }}/apk/ \;
           ls -lh ${{ github.workspace }}/apk/
 
       - name: Upload App To Artifact
