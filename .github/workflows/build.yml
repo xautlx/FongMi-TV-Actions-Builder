@@ -227,6 +227,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare App
+        run: |
+          mkdir -p ${{ github.workspace }}/apk/
+          find . -name "*.apk" -exec mv {} ${{ github.workspace }}/apk/ \;
+          ls -lh ${{ github.workspace }}/apk/
+
       - name: Build Summary
         if: always()
         run: |
