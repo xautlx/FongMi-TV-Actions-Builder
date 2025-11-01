@@ -10,7 +10,7 @@ on:
         default: false
         type: boolean
   schedule:
-    - cron: "0 * * * *" # Run every hour
+    - cron: "0 0 * * *" # Run every day
 
 permissions:
   contents: write
@@ -238,7 +238,7 @@ jobs:
       - name: Push to another repository
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         with:
           source-directory: 'apk' # 指定要上传的目录
           destination-github-username: 'xautlx' # 目标仓库的用户名
