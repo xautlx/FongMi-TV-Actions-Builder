@@ -234,6 +234,18 @@ jobs:
           find . -name "*.apk" -exec mv {} ${{ github.workspace }}/apk/ \;
           ls -lh ${{ github.workspace }}/apk/
 
+      - name: Push to another repository
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: 'apk' # 指定要上传的目录
+          destination-github-username: 'xautlx' # 目标仓库的用户名
+          destination-repository-name: 'FongMi-TV-Release' # 目标仓库名称
+          user-email: 'xautlx@hotmail.com' # 你的邮箱地址
+          commit-email: 'xautlx@hotmail.com' # 提交使用的邮箱地址
+          target-branch: 'main' # 目标分支
+
       - name: Upload App To Artifact
         uses: actions/upload-artifact@v4
         with:
