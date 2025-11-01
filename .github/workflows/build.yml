@@ -6,10 +6,10 @@ on:
       force_build:
         description: "Force build even if no changes detected"
         required: false
-        default: false
+        default: "false"
         type: boolean
   schedule:
-    - cron: "0 * * * *" # Run every day
+    - cron: "0 0 * * *" # Run daily
 
 permissions:
   contents: write
@@ -39,6 +39,8 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Checkout source code
         uses: actions/checkout@v5
@@ -46,6 +48,7 @@ jobs:
           repository: ${{ env.SOURCE_REPO }}
           ref: ${{ env.SOURCE_BRANCH }}
           path: src
+          fetch-depth: 0
 
       - name: Capture commit hashes
         id: commit_info
@@ -67,7 +70,15 @@ jobs:
       - name: Check if build is needed
         id: check_build
         run: |
+          set -euo pipefail
           echo "🔍 Checking if build is needed..."
+
+          # Ensure jq is available for JSON parsing
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "🔧 Installing jq for JSON parsing..."
+            sudo apt-get update -y
+            sudo apt-get install -y jq
+          fi
 
           # Force build if requested via workflow dispatch
           if [ "${{ github.event.inputs.force_build }}" = "true" ]; then
@@ -80,6 +91,7 @@ jobs:
 
           latest_tag=""
           retry_count=0
+          http_code=""
 
           while [ $retry_count -lt $API_RETRY_COUNT ]; do
             echo "📡 Attempting to fetch latest release (attempt $((retry_count + 1))/$API_RETRY_COUNT)..."
@@ -142,7 +154,7 @@ jobs:
           fi
 
       - name: Set up JDK 17
-        if: steps.check_build.outputs.build_needed == 'true'
+        if: ${{ steps.check_build.outputs.build_needed == 'true' }}
         uses: actions/setup-java@v5
         with:
           distribution: "temurin"
@@ -150,7 +162,7 @@ jobs:
           cache: "gradle"
 
       - name: Cache Gradle dependencies
-        if: steps.check_build.outputs.build_needed == 'true'
+        if: ${{ steps.check_build.outputs.build_needed == 'true' }}
         uses: actions/cache@v4
         with:
           path: |
@@ -162,7 +174,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Decode signing keystore
-        if: steps.check_build.outputs.build_needed == 'true'
+        if: ${{ steps.check_build.outputs.build_needed == 'true' }}
         run: |
           echo "🔐 Decoding signing keystore..."
           if [ -z "$KEYSTORE_BASE64" ]; then
@@ -177,7 +189,7 @@ jobs:
           echo "✅ Keystore decoded successfully"
 
       - name: Build release APKs
-        if: steps.check_build.outputs.build_needed == 'true'
+        if: ${{ steps.check_build.outputs.build_needed == 'true' }}
         run: |
           echo "🔨 Building release APKs..."
           cd src
@@ -207,7 +219,7 @@ jobs:
           echo "🔐 Keystore cleaned up"
 
       - name: Create GitHub Release
-        if: steps.check_build.outputs.build_needed == 'true'
+        if: ${{ steps.check_build.outputs.build_needed == 'true' }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.commit_info.outputs.short_hash }}
