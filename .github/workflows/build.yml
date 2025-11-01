@@ -229,6 +229,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prepare App
+        if: steps.check_build.outputs.build_needed == 'true'
         run: |
           mkdir -p ${{ github.workspace }}/apk/
           find . -name "*.apk" -type f -exec ls -lh {} \;
@@ -236,6 +237,7 @@ jobs:
           ls -lh ${{ github.workspace }}/apk/
 
       - name: Push to another repository
+        if: steps.check_build.outputs.build_needed == 'true'
         uses: cpina/github-action-push-to-another-repository@main
         env:
           SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
