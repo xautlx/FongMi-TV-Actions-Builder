@@ -247,12 +247,6 @@ jobs:
           commit-email: 'xautlx@hotmail.com' # 提交使用的邮箱地址
           target-branch: 'main' # 目标分支
 
-      - name: Upload App To Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: com.github.tvbox.fongmi
-          path: ${{ github.workspace }}/apk/*.apk
-
       - name: Build Summary
         if: always()
         run: |
