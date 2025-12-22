@@ -9,8 +9,8 @@ on:
         required: false
         default: false
         type: boolean
-  schedule:
-    - cron: "0 0 * * *" # Run every day
+#  schedule:
+#    - cron: "0 0 * * *" # Run every day
 
 permissions:
   contents: write
